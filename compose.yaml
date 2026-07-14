@@ -27,7 +27,7 @@ services:
     container_name: yt-media-info-mcp
     restart: unless-stopped
     ports:
-      - "${YT_MEDIA_INFO_PORT:-9423}:9423"
+      - "${YT_MEDIA_INFO_PORT:-9423}:${YT_MEDIA_INFO_PORT:-9423}"
     env_file: .env
     environment:
       # Override for Docker networking: Python service is reachable by service name
