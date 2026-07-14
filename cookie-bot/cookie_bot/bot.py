@@ -148,21 +148,21 @@ async def run_setup():
         logger.info("Setup mode: launching Chromium with remote debugging …")
         browser = await pw.chromium.launch(
             headless=False,
-            args=["--remote-debugging-port=9222"],
+            args=["--remote-debugging-port=9222", "--remote-debugging-address=0.0.0.0"],
         )
         context = await browser.new_context()
 
-        # Print connection instructions
         print("=" * 60)
         print("cookie-bot — Interactive Setup Mode")
         print("=" * 60)
         print("")
-        print("Chromium is running with remote debugging on port 9222.")
+        print("Chromium is running with remote debugging on port 9222 (0.0.0.0).")
         print("")
         print("To connect and complete login:")
-        print("  1. Open Chrome/Chromium on your host machine")
+        print("  1. Open Chrome/Chromium on your local machine")
         print('  2. Navigate to chrome://inspect')
-        print("  3. Click 'Configure…' and add localhost:9222")
+        print("  3. Click 'Configure…' and add <SERVER_IP>:9222")
+        print("     (e.g. 192.168.1.20:9222)")
         print("  4. Click 'Inspect' under the remote target")
         print("")
         print("For each configured provider, log in interactively.")

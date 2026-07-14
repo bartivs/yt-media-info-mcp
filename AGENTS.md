@@ -71,6 +71,7 @@ volume and consumed by the Python service on every yt-dlp call.
 - **Directory**: `cookie-bot/cookie_bot/` — Python package
 - **Dockerfile**: `cookie-bot/Dockerfile` — base `mcr.microsoft.com/playwright/python:v1.53.0`
 - **Service name**: `cookie-bot` (Compose profile `--profile cookies`)
+- **CDP port**: Port `9222` is exposed for remote debugging during `--setup` mode
 - **Shared volume**: `cookies-data` named volume (ro mount on yt-media-info-service, rw on cookie-bot)
 - **Cookie file**: `/data/cookies.txt` (Netscape format, read by yt-dlp as `cookiefile`)
 - **Session persistence**: Playwright `storage_state()` saved to `/data/browser-state.json`
@@ -94,7 +95,7 @@ All cookie-related vars are **optional**. The system works without cookies.
 1. Configure provider credentials in `.env`
 2. Start with profile: `docker compose --profile cookies up -d`
 3. Run interactive setup: `docker compose --profile cookies run --service-ports cookie-bot --setup`
-4. Connect via `chrome://inspect`, log in, press Enter in terminal
+4. Connect via `chrome://inspect` to `<SERVER_IP>:9222` (e.g. `192.168.1.20:9222`), log in, press Enter in terminal
 5. Bot runs automatically, refreshing cookies every 4 hours
 
 ### Gotchas
