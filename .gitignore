@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+src/node_modules/
+service/__pycache__/
+service/*.egg-info/
+service/.venv/
+service/venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Build / bundle output
+dist/
+build/
+*.tar.gz
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Environment overrides (keep committed .env defaults, ignore local secrets)
+.env.local
+.env.*.local
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+
+# Test artifacts
+coverage/
+.nyc_output/
