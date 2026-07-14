@@ -12,7 +12,7 @@ The Node MCP server SHALL support two transport modes controlled by the `ENABLE_
 - **THEN** it starts an Express server on `YTDLP_HOST:YTDLP_PORT` exposing `/sse`, `/messages`, `/api`, and `/health`
 
 ### Requirement: Direct API shortcut
-In SSE mode the server SHALL expose a `POST /api` endpoint that accepts a JSON body describing a tool call and returns the tool's result directly, bypassing the MCP JSON-RPC protocol. This mirrors the reference jobspy server's `/api` shortcut.
+In SSE mode the server SHALL expose a `POST /api` endpoint that accepts a JSON body describing a tool call and returns the tool's result directly, bypassing the MCP JSON-RPC protocol.
 
 #### Scenario: Direct API call
 - **WHEN** a client POSTs JSON to `/api` describing an `extract_info` call
@@ -26,7 +26,7 @@ In SSE mode the server SHALL expose a `GET /health` endpoint returning `{ "statu
 - **THEN** the server responds with HTTP 200 and a JSON body indicating healthy status
 
 ### Requirement: Environment configuration
-The server SHALL read configuration from environment variables (with `.env` defaults): `ENABLE_SSE`, `YTDLP_PORT` (default 9423), `YTDLP_HOST` (default 0.0.0.0), `YTDLP_SERVICE_URL` (default `http://yt-dlp-service:8000`), `YTDLP_API_KEY`, `YTDLP_USERNAME`, `YTDLP_PASSWORD`, `LOG_LEVEL` (default info).
+The server SHALL read configuration from environment variables (documented in `env.example`): `ENABLE_SSE`, `YTDLP_PORT` (default 9423), `YTDLP_HOST` (default 0.0.0.0), `YTDLP_SERVICE_URL` (default `http://yt-dlp-service:8000`), `YTDLP_API_KEY`, `YTDLP_USERNAME`, `YTDLP_PASSWORD`, `LOG_LEVEL` (default info).
 
 #### Scenario: Defaults apply
 - **WHEN** no environment variables are set
@@ -48,14 +48,14 @@ When `YTDLP_API_KEY` is set to a non-empty value, the HTTP endpoints (`/api`, `/
 - **THEN** stdio JSON-RPC traffic is not subject to API key checks
 
 ### Requirement: SSE progress notifications
-In SSE mode the server SHALL emit MCP progress notifications to connected clients during long-running tool calls, mirroring the reference jobspy server's progress behavior. Progress notifications SHALL NOT be emitted in stdio mode.
+In SSE mode the server SHALL emit MCP progress notifications to connected clients during long-running tool calls. Progress notifications SHALL NOT be emitted in stdio mode.
 
 #### Scenario: Progress during long call
 - **WHEN** a long-running tool call is in progress on an SSE connection
 - **THEN** the server emits `notifications/progress` messages with increasing progress values up to 100 on completion
 
 ### Requirement: Structured logging
-The server SHALL use Winston logging with a configurable `LOG_LEVEL` and JSON-formatted, colorized console output, mirroring the reference jobspy logger.
+The server SHALL use Winston logging with a configurable `LOG_LEVEL` and JSON-formatted, colorized console output.
 
 #### Scenario: Log level respected
 - **WHEN** `LOG_LEVEL=debug`

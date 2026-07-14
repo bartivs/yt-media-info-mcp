@@ -1,9 +1,9 @@
 ## 1. Project Scaffolding
 
 - [x] 1.1 Create `package.json` (ESM, `"type": "module"`, scripts: start, dev, lint) with dependencies `@modelcontextprotocol/sdk`, `express`, `cors`, `zod`, `winston`
-- [x] 1.2 Create `.env`
+- [x] 1.2 Create `env.example` with default configuration
 - [x] 1.3 Create `eslint.config.cjs` (flat config) and `.gitignore`
-- [x] 1.4 Create `Taskfile.yaml` mirroring jobspy (start, build aliases)
+- [x] 1.4 Create `Taskfile.yaml` with start, dev, build, compose aliases
 
 ## 2. Python Service (service/)
 
@@ -17,8 +17,8 @@
 
 ## 3. Node MCP Server (src/)
 
-- [x] 3.1 Create `src/logger.js` (Winston, JSON + colorized console, `LOG_LEVEL` configurable) mirroring jobspy
-- [x] 3.2 Create `src/sseManager.js` (SSE transport lifecycle + progress notifications) mirroring jobspy
+- [x] 3.1 Create `src/logger.js` (Winston, JSON + colorized console, `LOG_LEVEL` configurable)
+- [x] 3.2 Create `src/sseManager.js` (SSE transport lifecycle + progress notifications)
 - [x] 3.3 Create `src/schemas/extractInfoSchema.js` (Zod raw shapes for `extract_info` params: url, include_raw, username, password)
 - [x] 3.4 Create `src/schemas/transcriptSchema.js` (Zod raw shapes: url, language, timestamps, username, password)
 - [x] 3.5 Create `src/schemas/searchSchema.js` (Zod raw shapes: query, limit, platform)
@@ -32,7 +32,7 @@
 
 - [x] 4.1 Create `src/index.js`: instantiate `McpServer`, register prompts and tools, wire `SseManager`
 - [x] 4.2 Implement stdio transport path (`ENABLE_SSE=0`) using `StdioServerTransport`
-- [x] 4.3 Implement SSE transport path (`ENABLE_SSE=1`): Express + cors + `/sse` + `/messages` + `/health` + `/api` (direct shortcut) mirroring jobspy
+- [x] 4.3 Implement SSE transport path (`ENABLE_SSE=1`): Express + cors + `/sse` + `/messages` + `/health` + `/api` (direct shortcut)
 - [x] 4.4 Implement optional bearer API key middleware: when `YTDLP_API_KEY` non-empty, require `Authorization: Bearer <key>` on `/api`, `/sse`, `/messages`; stdio unaffected
 - [x] 4.5 Implement graceful shutdown (`SIGINT`/`SIGTERM`): disconnect transports, close HTTP server, exit 0
 - [x] 4.6 Add SSE progress notifications to tool handlers (SSE mode only)
@@ -45,7 +45,7 @@
 
 ## 6. Documentation
 
-- [x] 6.1 Create `AGENTS.md` documenting architecture, key files, gotchas (mirroring jobspy's AGENTS.md)
+- [x] 6.1 Create `AGENTS.md` documenting architecture, key files, gotchas
 - [x] 6.2 Create `README.md` with features, prerequisites, install, env var table, usage (stdio + SSE + curl `/api`), Docker Compose, Claude Desktop / Claude Code / LiteLLM connection examples, and the 3 tools' parameter tables
 - [x] 6.3 Document the snake_case output convention, ISO 8601 dates, and that media downloading is out of scope for v1
 

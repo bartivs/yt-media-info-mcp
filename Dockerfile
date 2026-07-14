@@ -8,7 +8,7 @@ RUN npm install --omit=dev
 
 # Copy source code
 COPY src/ ./src/
-COPY .env ./.env
+COPY env.example ./.env
 
 # Expose MCP HTTP port (SSE mode)
 EXPOSE 9423

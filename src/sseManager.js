@@ -4,7 +4,7 @@ import logger from './logger.js';
 
 /**
  * Manages SSE server transports for multiple client connections.
- * Mirrors the jobspy-mcp-server SseManager pattern.
+ * Manages SSE server transports for multiple client connections.
  */
 class SseManager {
   /** @type {Object.<string, SSEServerTransport>} */

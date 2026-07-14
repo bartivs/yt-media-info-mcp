@@ -4,7 +4,7 @@ A Model Context Protocol (MCP) server that enables AI assistants to extract rich
 
 Designed to sit alongside web-search tools as a **media enrichment step** in an information-gathering pipeline. Given a URL (video, playlist, channel, podcast, etc.), it returns structured metadata — title, description, duration, chapters, subtitles, formats, statistics — that AI models can reason over.
 
-Built in the style of [bartivs/jobspy-mcp-server](https://github.com/bartivs/jobspy-mcp-server).
+Built to complement web-search and other discovery tools as a media-enrichment step.
 
 ## Features
 
@@ -67,7 +67,7 @@ YTDLP_SERVICE_URL=http://localhost:8000 npm start
 | `YTDLP_PASSWORD` | Default password for yt-dlp site auth | (empty) |
 | `LOG_LEVEL` | Winston log level (error, warn, info, debug) | `info` |
 
-Defaults are in `.env` (committed). Override locally via `.env.local`.
+Copy `env.example` to `.env` and customize. `.env` is gitignored — use `.env.local` for per-machine secrets not tracked by git.
 
 ## Usage
 
