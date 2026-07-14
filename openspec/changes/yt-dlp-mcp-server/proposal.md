@@ -26,9 +26,9 @@ There is no MCP server that exposes yt-dlp's metadata extraction capabilities to
 
 ## Impact
 
-- **New code**: `src/` (Node MCP server), `service/` (Python FastAPI app), `compose.yaml`, `Taskfile.yaml`, `package.json`, `service/requirements.txt`, `service/Dockerfile`, `env.example`, `AGENTS.md`, `README.md`.
+- **New code**: `src/` (Node MCP server), `service/` (Python FastAPI app), `compose.yaml`, `Taskfile.yaml`, `package.json`, `service/requirements.txt`, `service/Dockerfile`, `.env.example`, `AGENTS.md`, `README.md`.
 - **Dependencies (Node)**: `@modelcontextprotocol/sdk`, `express`, `cors`, `zod`, `winston`.
 - **Dependencies (Python)**: `yt-dlp[default]`, `fastapi`, `uvicorn[standard]`.
 - **Docker**: Two images built from repo — `yt-dlp-service` (python:3.12-slim based) and `yt-media-info-mcp` (node:20-alpine based). No host Docker socket mount required (HTTP between containers, not Docker-socket subprocess).
-- **Configuration**: `env.example` with `ENABLE_SSE`, `YT_MEDIA_INFO_PORT`, `YT_MEDIA_INFO_HOST`, `YT_MEDIA_INFO_SERVICE_URL`, `YT_MEDIA_INFO_API_KEY`, `YT_MEDIA_INFO_USERNAME`, `YT_MEDIA_INFO_PASSWORD`, `LOG_LEVEL`.
+- **Configuration**: `.env.example` with `ENABLE_SSE`, `YT_MEDIA_INFO_PORT`, `YT_MEDIA_INFO_HOST`, `YT_MEDIA_INFO_SERVICE_URL`, `YT_MEDIA_INFO_API_KEY`, `YT_MEDIA_INFO_USERNAME`, `YT_MEDIA_INFO_PASSWORD`, `LOG_LEVEL`.
 - **No breaking changes** — greenfield repository (`openspec/specs/` is empty, no existing code).

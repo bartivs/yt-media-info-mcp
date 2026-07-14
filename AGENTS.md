@@ -40,7 +40,7 @@ npm run lint            # ESLint flat config
 | `service/main.py` | FastAPI application with `/health`, `/info`, `/transcript`, `/search` endpoints |
 | `service/requirements.txt` | Python dependencies: `yt-dlp[default]`, `fastapi`, `uvicorn[standard]` |
 | `compose.yaml` | Two-container Docker Compose with healthcheck + bridge network |
-| `env.example` | Default environment configuration (committed; copy to `.env` and customize) |
+| `.env.example` | Default environment configuration (committed; copy to `.env` and customize) |
 
 ## Conventions
 
@@ -52,9 +52,9 @@ npm run lint            # ESLint flat config
 
 - **No ffmpeg**: This server does NOT download media. It is an info-extraction and transcript tool. ffmpeg is not required and not included in the Python image.
 - **Python service cold start**: The first request after `docker compose up` will wait for the health check. Subsequent calls are warm.
-- **API key**: Set `YT_MEDIA_INFO_API_KEY` in `.env` (copy from `env.example` first). Default is empty (no auth). stdio mode is never affected.
-- **Username/password**: Per-call `username`/`password` params override `env.example` defaults (`YT_MEDIA_INFO_USERNAME`/`YT_MEDIA_INFO_PASSWORD`). Passed through to yt-dlp's `YoutubeDL` opts for site authentication.
-- **`env.example` is committed** with safe defaults. Copy to `.env` and customize. Use `.env.local` for secrets that should not be tracked.
+- **API key**: Set `YT_MEDIA_INFO_API_KEY` in `.env` (copy from `.env.example` first). Default is empty (no auth). stdio mode is never affected.
+- **Username/password**: Per-call `username`/`password` params override `.env.example` defaults (`YT_MEDIA_INFO_USERNAME`/`YT_MEDIA_INFO_PASSWORD`). Passed through to yt-dlp's `YoutubeDL` opts for site authentication.
+- **`.env.example` is committed** with safe defaults. Copy to `.env` and customize. Use `.env.local` for secrets that should not be tracked.
 - **Search platform mapping**: `youtube` → `ytsearch:`, `google_videos` → `gvsearch:`.
 - **Transcript language fallback**: If the requested language is unavailable, the first available language is returned. The response includes the actual language used.
 - **No caching**: Each `extract_info` call re-extracts metadata from the URL. No in-memory caching in v1.

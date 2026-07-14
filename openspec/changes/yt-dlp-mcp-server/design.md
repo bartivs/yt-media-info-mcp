@@ -54,7 +54,7 @@ Full extraction failure → MCP standard `{ isError: true, error: { message, cod
 - [Persistent service memory growth] → Mitigation: each request creates a fresh `YoutubeDL()` instance (no global ydl reuse); consider a future TTL cache. For v1, monitor memory; restart policy `unless-stopped` covers leaks.
 - [yt-dlp extractor breakage (sites change)] → Mitigation: pin a yt-dlp version in `requirements.txt` but document the upgrade path (`pip install -U "yt-dlp[default]"`). Best-effort error handling returns what we got.
 - [FastAPI/uvicorn added dependency surface vs simpler stdout-parsing] → Mitigation: offset by auto `/docs` aiding debugging; Pydantic models double as request validation.
-- [Auth API key in committed `env.example` defaults] → Mitigation: default `YT_MEDIA_INFO_API_KEY` is empty (auth disabled); document that users should copy `env.example` to `.env` and set the key. Never log the key.
+- [Auth API key in committed `.env.example` defaults] → Mitigation: default `YT_MEDIA_INFO_API_KEY` is empty (auth disabled); document that users should copy `.env.example` to `.env` and set the key. Never log the key.
 - [snake_case output avoids camelCase conversion] → Mitigation: matches yt-dlp native format, no `change-case-object` dependency needed.
 - [Cold start of the Python service on first `compose up`] → Mitigation: healthcheck prevents Node from calling before ready; first request after startup is the only "warm-up" cost.
 - [Some sites require cookies/JS impersonation and will fail] → Mitigation: best-effort errors; document known limitations. `curl-cffi` not included in v1 but can be added as an extra later.

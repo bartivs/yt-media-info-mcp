@@ -1,7 +1,7 @@
 ## 1. Project Scaffolding
 
 - [x] 1.1 Create `package.json` (ESM, `"type": "module"`, scripts: start, dev, lint) with dependencies `@modelcontextprotocol/sdk`, `express`, `cors`, `zod`, `winston`
-- [x] 1.2 Create `env.example` with default configuration
+- [x] 1.2 Create `.env.example` with default configuration
 - [x] 1.3 Create `eslint.config.cjs` (flat config) and `.gitignore`
 - [x] 1.4 Create `Taskfile.yaml` with start, dev, build, compose aliases
 

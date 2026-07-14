@@ -67,7 +67,7 @@ YT_MEDIA_INFO_SERVICE_URL=http://localhost:8000 npm start
 | `YT_MEDIA_INFO_PASSWORD` | Default password for yt-dlp site auth | (empty) |
 | `LOG_LEVEL` | Winston log level (error, warn, info, debug) | `info` |
 
-Copy `env.example` to `.env` and customize. `.env` is gitignored — use `.env.local` for per-machine secrets not tracked by git.
+Copy `.env.example` to `.env` and customize. `.env` is gitignored — use `.env.local` for per-machine secrets not tracked by git.
 
 ## Usage
 

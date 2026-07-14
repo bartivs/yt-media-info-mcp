@@ -26,7 +26,7 @@ In SSE mode the server SHALL expose a `GET /health` endpoint returning `{ "statu
 - **THEN** the server responds with HTTP 200 and a JSON body indicating healthy status
 
 ### Requirement: Environment configuration
-The server SHALL read configuration from environment variables (documented in `env.example`): `ENABLE_SSE`, `YT_MEDIA_INFO_PORT` (default 9423), `YT_MEDIA_INFO_HOST` (default 0.0.0.0), `YT_MEDIA_INFO_SERVICE_URL` (default `http://yt-media-info-service:8000`), `YT_MEDIA_INFO_API_KEY`, `YT_MEDIA_INFO_USERNAME`, `YT_MEDIA_INFO_PASSWORD`, `LOG_LEVEL` (default info).
+The server SHALL read configuration from environment variables (documented in `.env.example`): `ENABLE_SSE`, `YT_MEDIA_INFO_PORT` (default 9423), `YT_MEDIA_INFO_HOST` (default 0.0.0.0), `YT_MEDIA_INFO_SERVICE_URL` (default `http://yt-media-info-service:8000`), `YT_MEDIA_INFO_API_KEY`, `YT_MEDIA_INFO_USERNAME`, `YT_MEDIA_INFO_PASSWORD`, `LOG_LEVEL` (default info).
 
 #### Scenario: Defaults apply
 - **WHEN** no environment variables are set
