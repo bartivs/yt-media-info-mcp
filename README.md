@@ -1,10 +1,16 @@
 # yt-media-info MCP
 
-A Model Context Protocol (MCP) server that enables AI assistants to extract rich metadata from media URLs across thousands of sites using [yt-dlp](https://github.com/yt-dlp/yt-dlp).
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![MCP](https://img.shields.io/badge/Model_Context_Protocol-Server-blueviolet)](https://modelcontextprotocol.io)
+[![yt-dlp](https://img.shields.io/badge/Powered_by-yt--dlp-red)](https://github.com/yt-dlp/yt-dlp)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ed?logo=docker&logoColor=white)](#docker-compose)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)](#prerequisites)
 
-Designed to sit alongside web-search tools as a **media enrichment step** in an information-gathering pipeline. Given a URL (video, playlist, channel, podcast, etc.), it returns structured metadata — title, description, duration, chapters, subtitles, formats, statistics — that AI models can reason over.
+> Extract rich metadata, transcripts, and search from any yt-dlp-supported media URL — for Claude, Anthropic, and any MCP-compatible AI assistant.
 
-Built to complement web-search and other discovery tools as a media-enrichment step.
+**yt-media-info MCP** is a [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server that lets AI assistants extract structured metadata from media URLs across **1800+ sites** using [yt-dlp](https://github.com/yt-dlp/yt-dlp) — YouTube, Vimeo, Twitch, podcasts, and more. Given a URL (video, playlist, channel, podcast), it returns title, description, duration, chapters, subtitles/captions, formats, and statistics that models can reason over.
+
+Built to sit alongside web-search tools as a **media-enrichment step** in an information-gathering pipeline. Works with Claude Desktop, Claude Code, LiteLLM, and any MCP client over stdio or SSE.
 
 ## Features
 
