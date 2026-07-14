@@ -18,7 +18,7 @@ services:
     networks:
       - yt-media-info-network
     volumes:
-      - cookies-data:/data:ro
+      - cookies-data:/data
 
   # Node MCP server exposing yt-dlp capabilities via MCP stdio/SSE
   yt-media-info-mcp:
