@@ -37,6 +37,8 @@ services:
     depends_on:
       yt-media-info-service:
         condition: service_healthy
+    volumes:
+      - cookies-data:/data
     networks:
       - yt-media-info-network
 

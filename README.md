@@ -247,6 +247,47 @@ Supplementary discovery tool. Searches for media using yt-dlp's search prefixes 
 - **ISO 8601** date strings (e.g. `"2024-01-15"` for upload_date, `"2024-01-15T14:30:00Z"` for timestamps)
 - **Best-effort error handling**: complete failures return an error response; missing fields are `null`; playlist entries that fail are collected in a `failures` array
 
+## Cookie Management
+
+When running in SSE mode, the server provides a web-based cookie upload form at `http://<host>:<port>/` (default `http://localhost:9423/`) for uploading Netscape-format cookie files.
+
+### Web Upload Flow
+
+1. **Export cookies** from your browser using yt-dlp:
+   ```bash
+   yt-dlp --cookies-from-browser chrome --cookies cookies.txt
+   ```
+   Or use a browser extension like [Get cookies.txt LOCALLY](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc).
+
+2. **Open the form** at `http://localhost:9423/` in your browser.
+
+3. **Upload** the `cookies.txt` file — the form validates the file format, writes it atomically to the shared Docker volume at `/data/cookies.txt`, and displays parsed cookie info (domains, count, earliest expiry).
+
+4. **Delete** cookies via the form's delete button when needed.
+
+### Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/` | HTML upload form |
+| `POST` | `/upload-cookies` | Upload a cookies.txt file (multipart/form-data, field name `cookies`) |
+| `POST` | `/delete-cookies` | Delete the cookie file |
+
+All endpoints are protected by the same `YT_MEDIA_INFO_API_KEY` bearer auth as the other HTTP endpoints (when configured).
+
+### Cookie File Format
+
+The file must:
+- Start with `# Netscape HTTP Cookie File`
+- Be under 1 MB
+- Use tab-separated Netscape cookie format
+
+### Cookie-bot Sidecar
+
+If you have the [cookie-bot sidecar](AGENTS.md#cookie-bot-optional-sidecar) running (opt-in via `docker compose --profile cookies up -d`), it will periodically refresh cookies from the shared volume. The web upload form is a convenient way to seed the initial cookie file — the cookie-bot then takes over automated refreshes.
+
+> **Note:** The cookie-bot's automated refresh will overwrite a manually uploaded file. Use the web form for initial seeding, then let the bot handle refreshes.
+
 ## Scope
 
 **This server does NOT download media files.** It is a metadata enrichment and transcript extraction tool designed to work alongside other search and retrieval tools. No ffmpeg is required.

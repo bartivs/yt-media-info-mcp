@@ -16,7 +16,7 @@ npm run lint            # ESLint flat config
 - Wraps the **Python yt-dlp library** via a **persistent FastAPI HTTP service** (`yt-dlp-service`), not via `docker run --rm`. The service imports yt-dlp once at startup and caches extractors.
 - **Two transport modes** controlled by `ENABLE_SSE` env var:
   - **stdio** (`ENABLE_SSE=0`, default): connect via `StdioServerTransport` — used by Claude Desktop.
-  - **SSE** (`ENABLE_SSE=1`): Express on `YT_MEDIA_INFO_HOST:YT_MEDIA_INFO_PORT` (default `0.0.0.0:9423`). Endpoints: `GET /sse`, `POST /messages`, `POST /api`, `GET /health`.
+  - **SSE** (`ENABLE_SSE=1`): Express on `YT_MEDIA_INFO_HOST:YT_MEDIA_INFO_PORT` (default `0.0.0.0:9423`). Endpoints: `GET /sse`, `POST /messages`, `POST /api`, `GET /health`, `GET /` (cookie upload form), `POST /upload-cookies`, `POST /delete-cookies`.
 - `POST /api` is a shortcut that calls the Python service directly for a specific tool (bypasses MCP protocol). Usage: `{ "tool": "extract_info", "args": { "url": "..." } }`.
 - **Three MCP tools**: `extract_info`, `get_transcript`, `search_media`.
 - **Two MCP prompts**: `analyze_video`, `summarize_transcript`.
@@ -27,7 +27,7 @@ npm run lint            # ESLint flat config
 
 | Path | Role |
 |------|------|
-| `src/index.js` | Server bootstrap, transport setup, graceful shutdown, direct `/api` handler |
+| `src/index.js` | Server bootstrap, transport setup, graceful shutdown, direct `/api` handler, cookie upload routes and helpers |
 | `src/tools/extract-info.js` | `extract_info` MCP tool (POSTs to Python `/info`) |
 | `src/tools/get-transcript.js` | `get_transcript` MCP tool (POSTs to Python `/transcript`) |
 | `src/tools/search-media.js` | `search_media` MCP tool (POSTs to Python `/search`) |
@@ -39,7 +39,7 @@ npm run lint            # ESLint flat config
 | `src/logger.js` | Winston logger (JSON format, colorized console transport) |
 | `service/main.py` | FastAPI application with `/health`, `/info`, `/transcript`, `/search` endpoints |
 | `service/requirements.txt` | Python dependencies: `yt-dlp[default]`, `fastapi`, `uvicorn[standard]` |
-| `compose.yaml` | Two-container Docker Compose with healthcheck + bridge network |
+| `compose.yaml` | Three-container Docker Compose with healthcheck + bridge network (plus optional cookie-bot with `--profile cookies`) |
 | `.env.example` | Default environment configuration (committed; copy to `.env` and customize) |
 
 ## Conventions
@@ -106,3 +106,16 @@ All cookie-related vars are **optional**. The system works without cookies.
 - **Vimeo no 2FA**: Vimeo provider does not include 2FA support (Vimeo rarely uses it).
 - **Session expiry**: If automated re-login fails, re-run `--setup` to establish a fresh session.
 - **Cookie file staleness**: If cookies expire and the bot can't refresh, yt-dlp falls back to cookieless behaviour (same as current).
+
+### Web upload as seed path
+
+The MCP server's web upload form at `http://<host>:<port>/` (default `http://localhost:9423/`) is the recommended way to seed the initial cookie file before the cookie-bot takes over automated refreshes. Upload a `cookies.txt` exported from your browser, then let the bot handle periodic refreshes.
+
+To seed cookies before starting the bot:
+
+1. Export cookies: `yt-dlp --cookies-from-browser chrome --cookies cookies.txt`
+2. Navigate to `http://localhost:9423/`
+3. Upload the file — it's written to `/data/cookies.txt` on the shared volume
+4. Start the cookie-bot: `docker compose --profile cookies up -d`
+
+The bot will pick up the existing cookies and begin its refresh cycle.

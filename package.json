@@ -29,6 +29,7 @@
     "@modelcontextprotocol/sdk": "^1.10.1",
     "cors": "^2.8.5",
     "express": "^4.22.1",
+    "multer": "^2.2.0",
     "winston": "^3.10.0",
     "zod": "^3.24.3"
   },
