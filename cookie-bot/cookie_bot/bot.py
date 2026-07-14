@@ -13,6 +13,8 @@ import asyncio
 import logging
 import os
 import sys
+import time
+from pathlib import Path
 
 from cookie_bot.cli import parse_args
 from cookie_bot.providers import get_configured_providers
@@ -140,19 +142,81 @@ async def run_once():
             await browser.close()
 
 
+async def _wait_for_port(host: str, port: int, timeout: float = 15.0) -> bool:
+    """Wait until a TCP port is open (used to wait for Chromium's debug server)."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        try:
+            r, w = await asyncio.wait_for(
+                asyncio.open_connection(host, port), timeout=1
+            )
+            w.close()
+            await w.wait_closed()
+            return True
+        except (OSError, asyncio.TimeoutError):
+            await asyncio.sleep(0.5)
+    return False
+
+
+def _find_chromium() -> str | None:
+    """Find the bundled Chromium binary under /ms-playwright."""
+    for pattern in ("*/chrome-linux/chrome", "*/chrome-linux64/chrome"):
+        matches = sorted(Path("/ms-playwright").glob(pattern))
+        if matches:
+            return str(matches[-1])
+    return None
+
+
 async def run_setup():
-    """Launch Chromium with CDP for interactive login (--setup mode)."""
+    """Launch Chromium with CDP for interactive login (--setup mode).
+
+    Chromium is launched directly (not via Playwright's launch method) to
+    avoid Playwright's forced ``--remote-debugging-pipe`` flag. That flag
+    disables the HTTP debug server on port 9222, making chrome://inspect
+    connections impossible. By launching Chromium as a subprocess and then
+    connecting Playwright via CDP, we keep full control of the flags.
+    """
     from playwright.async_api import async_playwright
 
+    chromium_path = _find_chromium()
+    if not chromium_path:
+        logger.error("Chromium binary not found under /ms-playwright")
+        return
+
+    logger.info(
+        "Setup mode: launching %s with remote debugging …", chromium_path
+    )
+
+    proc = await asyncio.create_subprocess_exec(
+        chromium_path,
+        "--remote-debugging-port=9222",
+        "--remote-debugging-address=0.0.0.0",
+        "--no-first-run",
+        "--no-default-browser-check",
+        "--no-sandbox",
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--disable-extensions",
+        stdout=asyncio.subprocess.DEVNULL,
+        stderr=asyncio.subprocess.DEVNULL,
+    )
+
+    if not await _wait_for_port("127.0.0.1", 9222):
+        logger.error("Chromium debug server did not start within 15s")
+        proc.terminate()
+        try:
+            await asyncio.wait_for(proc.wait(), timeout=5)
+        except asyncio.TimeoutError:
+            proc.kill()
+        return
+
+    logger.info("Chromium debug server is ready on port 9222")
+
     async with async_playwright() as pw:
-        logger.info("Setup mode: launching Chromium with remote debugging …")
-        browser = await pw.chromium.launch(
-            headless=False,
-            args=["--remote-debugging-port=9222", "--remote-debugging-address=0.0.0.0"],
+        browser = await pw.chromium.connect_over_cdp(
+            "http://127.0.0.1:9222"
         )
         context = await browser.new_context()
-
-        # Open a page so chrome://inspect has a target to show
         page = await context.new_page()
 
         print("=" * 60)
@@ -160,10 +224,6 @@ async def run_setup():
         print("=" * 60)
         print("")
         print("Chromium is running with remote debugging on port 9222 (0.0.0.0).")
-        print("")
-        print("To verify connectivity, open this URL in your browser:")
-        print("  http://<SERVER_IP>:9222/json/version")
-        print("  (should return a JSON with Chromium version info)")
         print("")
         print("To log in interactively:")
         print("  1. Open Chrome/Chromium on your local machine")
@@ -178,17 +238,29 @@ async def run_setup():
         print("When you're done, return here and press Enter to save session.")
         print("")
         print("Press Enter after completing login in the browser …")
-        await asyncio.get_event_loop().run_in_executor(None, sys.stdin.readline)
+        await asyncio.get_event_loop().run_in_executor(
+            None, sys.stdin.readline
+        )
 
         # Collect cookies and save session
         all_cookies = await context.cookies()
         await save_session(context, STATE_FILE)
         write_cookie_file(all_cookies, COOKIE_FILE)
-        logger.info("Saved session state and %d cookies to %s", len(all_cookies), COOKIE_FILE)
+        logger.info(
+            "Saved session state and %d cookies to %s",
+            len(all_cookies),
+            COOKIE_FILE,
+        )
 
         await context.close()
-        await browser.close()
-        print("Setup complete. You can now start the cookie-bot in normal mode.")
+
+    # Shut down Chromium
+    proc.terminate()
+    try:
+        await asyncio.wait_for(proc.wait(), timeout=5)
+    except asyncio.TimeoutError:
+        proc.kill()
+    print("Setup complete. You can now start the cookie-bot in normal mode.")
 
 
 async def main():
