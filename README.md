@@ -1,4 +1,4 @@
-# yt-dlp MCP Server
+# yt-media-info MCP
 
 A Model Context Protocol (MCP) server that enables AI assistants to extract rich metadata from media URLs across thousands of sites using [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
@@ -28,7 +28,7 @@ Built to complement web-search and other discovery tools as a media-enrichment s
 
 ```bash
 # Clone the repository
-cd yt-dlp-mcp-server
+cd yt-media-info-mcp
 
 # Install Node dependencies
 npm install
@@ -49,7 +49,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 Then in another terminal:
 ```bash
-YTDLP_SERVICE_URL=http://localhost:8000 npm start
+YT_MEDIA_INFO_SERVICE_URL=http://localhost:8000 npm start
 ```
 
 ## Configuration
@@ -59,12 +59,12 @@ YTDLP_SERVICE_URL=http://localhost:8000 npm start
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `ENABLE_SSE` | Use SSE transport (vs stdio) | `0` |
-| `YTDLP_PORT` | HTTP server port (SSE mode) | `9423` |
-| `YTDLP_HOST` | HTTP server host (SSE mode) | `0.0.0.0` |
-| `YTDLP_SERVICE_URL` | URL of the Python yt-dlp service | `http://yt-dlp-service:8000` |
-| `YTDLP_API_KEY` | Optional bearer API key for HTTP endpoints | (empty = no auth) |
-| `YTDLP_USERNAME` | Default username for yt-dlp site auth | (empty) |
-| `YTDLP_PASSWORD` | Default password for yt-dlp site auth | (empty) |
+| `YT_MEDIA_INFO_PORT` | HTTP server port (SSE mode) | `9423` |
+| `YT_MEDIA_INFO_HOST` | HTTP server host (SSE mode) | `0.0.0.0` |
+| `YT_MEDIA_INFO_SERVICE_URL` | URL of the Python yt-dlp service | `http://yt-media-info-service:8000` |
+| `YT_MEDIA_INFO_API_KEY` | Optional bearer API key for HTTP endpoints | (empty = no auth) |
+| `YT_MEDIA_INFO_USERNAME` | Default username for yt-dlp site auth | (empty) |
+| `YT_MEDIA_INFO_PASSWORD` | Default password for yt-dlp site auth | (empty) |
 | `LOG_LEVEL` | Winston log level (error, warn, info, debug) | `info` |
 
 Copy `env.example` to `.env` and customize. `.env` is gitignored — use `.env.local` for per-machine secrets not tracked by git.
@@ -78,7 +78,7 @@ Copy `env.example` to `.env` and customize. `.env` is gitignored — use `.env.l
   "mcpServers": {
     "yt-dlp": {
       "command": "node",
-      "args": ["/path/to/yt-dlp-mcp-server/src/index.js"],
+      "args": ["/path/to/yt-media-info-mcp/src/index.js"],
       "env": {
         "ENABLE_SSE": "0"
       }
@@ -187,7 +187,7 @@ docker compose down            # stop
 docker compose build           # rebuild after changes
 ```
 
-The `yt-dlp-service` container is persistent and stays warm. The `yt-dlp-mcp-server` container waits for the health check on the Python service before accepting connections.
+The `yt-dlp-service` container is persistent and stays warm. The `yt-media-info-mcp` container waits for the health check on the Python service before accepting connections.
 
 ## Available Tools
 

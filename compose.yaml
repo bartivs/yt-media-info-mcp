@@ -1,11 +1,11 @@
 services:
   # Persistent Python service wrapping yt-dlp for metadata extraction
-  yt-dlp-service:
+  yt-media-info-service:
     build:
       context: ./service
       dockerfile: Dockerfile
-    image: yt-dlp-service
-    container_name: yt-dlp-service
+    image: yt-media-info-service
+    container_name: yt-media-info-service
     expose:
       - "8000" # internal only, not published to host
     healthcheck:
@@ -16,28 +16,28 @@ services:
       start_period: 30s
     env_file: .env
     networks:
-      - yt-dlp-network
+      - yt-media-info-network
 
   # Node MCP server exposing yt-dlp capabilities via MCP stdio/SSE
-  yt-dlp-mcp-server:
+  yt-media-info-mcp:
     build:
       context: .
       dockerfile: Dockerfile
-    image: yt-dlp-mcp
-    container_name: yt-dlp-mcp
+    image: yt-media-info-mcp
+    container_name: yt-media-info-mcp
     restart: unless-stopped
     ports:
-      - "${YTDLP_PORT:-9423}:9423"
+      - "${YT_MEDIA_INFO_PORT:-9423}:9423"
     env_file: .env
     environment:
       # Override for Docker networking: Python service is reachable by service name
-      YTDLP_SERVICE_URL: http://yt-dlp-service:8000
+      YT_MEDIA_INFO_SERVICE_URL: http://yt-media-info-service:8000
     depends_on:
-      yt-dlp-service:
+      yt-media-info-service:
         condition: service_healthy
     networks:
-      - yt-dlp-network
+      - yt-media-info-network
 
 networks:
-  yt-dlp-network:
+  yt-media-info-network:
     driver: bridge

@@ -1,7 +1,7 @@
 import logger from '../logger.js';
 import { extractInfoParams } from '../schemas/extractInfoSchema.js';
 
-const SERVICE_URL = process.env.YTDLP_SERVICE_URL || 'http://yt-dlp-service:8000';
+const SERVICE_URL = process.env.YT_MEDIA_INFO_SERVICE_URL || 'http://yt-media-info-service:8000';
 
 /**
  * extract_info MCP tool
@@ -37,8 +37,8 @@ export const extractInfoTool = (server, sseManager) =>
         const body = {
           url: params.url,
           include_raw: params.include_raw,
-          username: params.username || process.env.YTDLP_USERNAME || null,
-          password: params.password || process.env.YTDLP_PASSWORD || null,
+          username: params.username || process.env.YT_MEDIA_INFO_USERNAME || null,
+          password: params.password || process.env.YT_MEDIA_INFO_PASSWORD || null,
         };
 
         const response = await fetch(`${SERVICE_URL}/info`, {

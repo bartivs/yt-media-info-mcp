@@ -30,14 +30,14 @@ tasks:
       - eslint src/ --fix
 
   build:service:
-    desc: Build the yt-dlp Python service Docker image
+    desc: Build the Python service Docker image
     dir: service
     cmds:
       - >
         docker build
         --build-arg https_proxy=$https_proxy
         --build-arg NODE_TLS_REJECT_UNAUTHORIZED=0
-        -t yt-dlp-service .
+        -t yt-media-info-service .
 
   compose:up:
     cmds:

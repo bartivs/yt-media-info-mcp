@@ -1,12 +1,12 @@
 {
-  "name": "yt-dlp-mcp-server",
+  "name": "yt-media-info-mcp",
   "version": "1.0.0",
-  "description": "Model Context Protocol server for yt-dlp media metadata extraction",
+  "description": "Model Context Protocol server for media metadata extraction using yt-dlp",
   "main": "src/index.js",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bartivs/yt-dlp-mcp-server.git"
+    "url": "https://github.com/bartivs/yt-media-info-mcp.git"
   },
   "scripts": {
     "start": "node src/index.js",
@@ -18,7 +18,7 @@
   "keywords": [
     "mcp",
     "yt-dlp",
-    "yt-dlp-mcp",
+    "yt-media-info-mcp",
     "media",
     "metadata",
     "llm"

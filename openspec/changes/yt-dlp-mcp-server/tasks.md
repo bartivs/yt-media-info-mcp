@@ -22,9 +22,9 @@
 - [x] 3.3 Create `src/schemas/extractInfoSchema.js` (Zod raw shapes for `extract_info` params: url, include_raw, username, password)
 - [x] 3.4 Create `src/schemas/transcriptSchema.js` (Zod raw shapes: url, language, timestamps, username, password)
 - [x] 3.5 Create `src/schemas/searchSchema.js` (Zod raw shapes: query, limit, platform)
-- [x] 3.6 Create `src/tools/extract-info.js` (tool registration + handler that POSTs to `${YTDLP_SERVICE_URL}/info` and returns MCP content)
-- [x] 3.7 Create `src/tools/get-transcript.js` (tool registration + handler that POSTs to `${YTDLP_SERVICE_URL}/transcript`)
-- [x] 3.8 Create `src/tools/search-media.js` (tool registration + handler that POSTs to `${YTDLP_SERVICE_URL}/search`)
+- [x] 3.6 Create `src/tools/extract-info.js` (tool registration + handler that POSTs to `${YT_MEDIA_INFO_SERVICE_URL}/info` and returns MCP content)
+- [x] 3.7 Create `src/tools/get-transcript.js` (tool registration + handler that POSTs to `${YT_MEDIA_INFO_SERVICE_URL}/transcript`)
+- [x] 3.8 Create `src/tools/search-media.js` (tool registration + handler that POSTs to `${YT_MEDIA_INFO_SERVICE_URL}/search`)
 - [x] 3.9 Create `src/tools/index.js` re-exporting the three tools
 - [x] 3.10 Create `src/prompts/analyze-video.js` and `src/prompts/summarize-transcript.js` (Zod raw shape prompt schemas), plus `src/prompts/index.js`
 
@@ -33,13 +33,13 @@
 - [x] 4.1 Create `src/index.js`: instantiate `McpServer`, register prompts and tools, wire `SseManager`
 - [x] 4.2 Implement stdio transport path (`ENABLE_SSE=0`) using `StdioServerTransport`
 - [x] 4.3 Implement SSE transport path (`ENABLE_SSE=1`): Express + cors + `/sse` + `/messages` + `/health` + `/api` (direct shortcut)
-- [x] 4.4 Implement optional bearer API key middleware: when `YTDLP_API_KEY` non-empty, require `Authorization: Bearer <key>` on `/api`, `/sse`, `/messages`; stdio unaffected
+- [x] 4.4 Implement optional bearer API key middleware: when `YT_MEDIA_INFO_API_KEY` non-empty, require `Authorization: Bearer <key>` on `/api`, `/sse`, `/messages`; stdio unaffected
 - [x] 4.5 Implement graceful shutdown (`SIGINT`/`SIGTERM`): disconnect transports, close HTTP server, exit 0
 - [x] 4.6 Add SSE progress notifications to tool handlers (SSE mode only)
 
 ## 5. Docker Compose
 
-- [x] 5.1 Create `compose.yaml` with `yt-dlp-service` (build `./service`, expose 8000, `/health` healthcheck, bridge network) and `yt-dlp-mcp-server` (build `.`, ports `${YTDLP_PORT}:9423`, `depends_on` with `condition: service_healthy`, env_file `.env`, same network)
+- [x] 5.1 Create `compose.yaml` with `yt-dlp-service` (build `./service`, expose 8000, `/health` healthcheck, bridge network) and `yt-media-info-mcp` (build `.`, ports `${YT_MEDIA_INFO_PORT}:9423`, `depends_on` with `condition: service_healthy`, env_file `.env`, same network)
 - [x] 5.2 Create root `Dockerfile` for the Node server (node:20-alpine, `npm install --omit=dev`, run `src/index.js`)
 - [x] 5.3 Verify `docker compose up -d` brings both services up healthy and Node waits for Python readiness
 
@@ -51,8 +51,8 @@
 
 ## 7. Validation & Smoke Tests
 
-- [x] 7.1 Validate the change: `openspec validate --change yt-dlp-mcp-server`
+- [x] 7.1 Validate the change: `openspec validate --change yt-media-info-mcp`
 - [x] 7.2 Smoke test stdio mode against Claude Desktop config (or a stdio MCP client)
 - [x] 7.3 Smoke test SSE mode: `curl /health`, `curl -X POST /api` for each of the 3 tools, confirm SSE connection via `/sse` + `/messages`
-- [x] 7.4 Smoke test API key auth: with `YTDLP_API_KEY` set, confirm 401 without token and 200 with token
+- [x] 7.4 Smoke test API key auth: with `YT_MEDIA_INFO_API_KEY` set, confirm 401 without token and 200 with token
 - [x] 7.5 Verify best-effort error handling: an unsupported/private URL returns an MCP error response; a playlist with failing entries returns `failures[]`

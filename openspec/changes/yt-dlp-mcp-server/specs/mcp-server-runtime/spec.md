@@ -9,7 +9,7 @@ The Node MCP server SHALL support two transport modes controlled by the `ENABLE_
 
 #### Scenario: SSE mode
 - **WHEN** the server starts with `ENABLE_SSE=1`
-- **THEN** it starts an Express server on `YTDLP_HOST:YTDLP_PORT` exposing `/sse`, `/messages`, `/api`, and `/health`
+- **THEN** it starts an Express server on `YT_MEDIA_INFO_HOST:YT_MEDIA_INFO_PORT` exposing `/sse`, `/messages`, `/api`, and `/health`
 
 ### Requirement: Direct API shortcut
 In SSE mode the server SHALL expose a `POST /api` endpoint that accepts a JSON body describing a tool call and returns the tool's result directly, bypassing the MCP JSON-RPC protocol.
@@ -26,25 +26,25 @@ In SSE mode the server SHALL expose a `GET /health` endpoint returning `{ "statu
 - **THEN** the server responds with HTTP 200 and a JSON body indicating healthy status
 
 ### Requirement: Environment configuration
-The server SHALL read configuration from environment variables (documented in `env.example`): `ENABLE_SSE`, `YTDLP_PORT` (default 9423), `YTDLP_HOST` (default 0.0.0.0), `YTDLP_SERVICE_URL` (default `http://yt-dlp-service:8000`), `YTDLP_API_KEY`, `YTDLP_USERNAME`, `YTDLP_PASSWORD`, `LOG_LEVEL` (default info).
+The server SHALL read configuration from environment variables (documented in `env.example`): `ENABLE_SSE`, `YT_MEDIA_INFO_PORT` (default 9423), `YT_MEDIA_INFO_HOST` (default 0.0.0.0), `YT_MEDIA_INFO_SERVICE_URL` (default `http://yt-media-info-service:8000`), `YT_MEDIA_INFO_API_KEY`, `YT_MEDIA_INFO_USERNAME`, `YT_MEDIA_INFO_PASSWORD`, `LOG_LEVEL` (default info).
 
 #### Scenario: Defaults apply
 - **WHEN** no environment variables are set
 - **THEN** the server uses the documented defaults and starts in stdio mode
 
 ### Requirement: Optional bearer API key auth
-When `YTDLP_API_KEY` is set to a non-empty value, the HTTP endpoints (`/api`, `/sse`, `/messages`) SHALL require an `Authorization: Bearer <key>` header matching that value. When `YTDLP_API_KEY` is unset or empty, no auth is required. stdio mode SHALL never be subject to API key auth.
+When `YT_MEDIA_INFO_API_KEY` is set to a non-empty value, the HTTP endpoints (`/api`, `/sse`, `/messages`) SHALL require an `Authorization: Bearer <key>` header matching that value. When `YT_MEDIA_INFO_API_KEY` is unset or empty, no auth is required. stdio mode SHALL never be subject to API key auth.
 
 #### Scenario: API key enforced
-- **WHEN** `YTDLP_API_KEY` is set and a client calls `/api` without a matching bearer token
+- **WHEN** `YT_MEDIA_INFO_API_KEY` is set and a client calls `/api` without a matching bearer token
 - **THEN** the server responds with HTTP 401
 
 #### Scenario: API key disabled
-- **WHEN** `YTDLP_API_KEY` is unset or empty
+- **WHEN** `YT_MEDIA_INFO_API_KEY` is unset or empty
 - **THEN** all HTTP endpoints accept requests without an Authorization header
 
 #### Scenario: stdio unaffected
-- **WHEN** the server runs in stdio mode regardless of `YTDLP_API_KEY`
+- **WHEN** the server runs in stdio mode regardless of `YT_MEDIA_INFO_API_KEY`
 - **THEN** stdio JSON-RPC traffic is not subject to API key checks
 
 ### Requirement: SSE progress notifications

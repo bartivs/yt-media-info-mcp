@@ -531,7 +531,7 @@ def _extract_info(url: str, username: str = None, password: str = None) -> dict:
 @app.get("/health")
 async def health():
     """Health check for Docker compose."""
-    return {"status": "ok", "service": "yt-dlp-service"}
+    return {"status": "ok", "service": "yt-media-info-service"}
 
 
 @app.post("/info")

@@ -1,7 +1,7 @@
 import logger from '../logger.js';
 import { searchParams } from '../schemas/searchSchema.js';
 
-const SERVICE_URL = process.env.YTDLP_SERVICE_URL || 'http://yt-dlp-service:8000';
+const SERVICE_URL = process.env.YT_MEDIA_INFO_SERVICE_URL || 'http://yt-media-info-service:8000';
 
 /**
  * search_media MCP tool

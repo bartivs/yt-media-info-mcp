@@ -52,12 +52,12 @@ The tool SHALL use best-effort error handling: a complete extraction failure ret
 - **THEN** the response returns the successful entries in `playlist.entries` and lists failed entries in `playlist.failures`
 
 ### Requirement: Optional site authentication
-The `extract_info` tool SHALL accept optional `username` and `password` parameters that are passed through to yt-dlp's `YoutubeDL` opts for accessing protected content. When not provided per call, the system SHALL fall back to `YTDLP_USERNAME`/`YTDLP_PASSWORD` environment variables if set.
+The `extract_info` tool SHALL accept optional `username` and `password` parameters that are passed through to yt-dlp's `YoutubeDL` opts for accessing protected content. When not provided per call, the system SHALL fall back to `YT_MEDIA_INFO_USERNAME`/`YT_MEDIA_INFO_PASSWORD` environment variables if set.
 
 #### Scenario: Per-call credentials
 - **WHEN** `extract_info` is called with `username` and `password`
 - **THEN** those values are passed to `YoutubeDL` and used for site authentication
 
 #### Scenario: Env-default credentials
-- **WHEN** `extract_info` is called without `username`/`password` but `YTDLP_USERNAME`/`YTDLP_PASSWORD` are set
+- **WHEN** `extract_info` is called without `username`/`password` but `YT_MEDIA_INFO_USERNAME`/`YT_MEDIA_INFO_PASSWORD` are set
 - **THEN** the env values are used for authentication

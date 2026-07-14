@@ -4,7 +4,7 @@ There is no MCP server that exposes yt-dlp's metadata extraction capabilities to
 
 ## What Changes
 
-- Add a new MCP server (`yt-dlp-mcp-server`) built with Node.js + Express + @modelcontextprotocol/sdk, Zod schemas, Winston logging, dual stdio/SSE transports, and Docker Compose deployment.
+- Add a new MCP server (`yt-media-info-mcp`) built with Node.js + Express + @modelcontextprotocol/sdk, Zod schemas, Winston logging, dual stdio/SSE transports, and Docker Compose deployment.
 - Wrap yt-dlp as a **persistent Python HTTP service** (FastAPI + uvicorn) rather than `docker run --rm` per call, because metadata enrichment is chatty (multiple calls per conversation) and cold-start per call would dominate latency.
 - Expose **3 MCP tools**: `extract_info` (rich curated metadata + raw info dict), `get_transcript` (subtitle text), `search_media` (supplementary discovery via yt-dlp's search syntax).
 - Expose **2 MCP prompts**: `analyze_video`, `summarize_transcript`.
@@ -29,6 +29,6 @@ There is no MCP server that exposes yt-dlp's metadata extraction capabilities to
 - **New code**: `src/` (Node MCP server), `service/` (Python FastAPI app), `compose.yaml`, `Taskfile.yaml`, `package.json`, `service/requirements.txt`, `service/Dockerfile`, `env.example`, `AGENTS.md`, `README.md`.
 - **Dependencies (Node)**: `@modelcontextprotocol/sdk`, `express`, `cors`, `zod`, `winston`.
 - **Dependencies (Python)**: `yt-dlp[default]`, `fastapi`, `uvicorn[standard]`.
-- **Docker**: Two images built from repo — `yt-dlp-service` (python:3.12-slim based) and `yt-dlp-mcp-server` (node:20-alpine based). No host Docker socket mount required (HTTP between containers, not Docker-socket subprocess).
-- **Configuration**: `env.example` with `ENABLE_SSE`, `YTDLP_PORT`, `YTDLP_HOST`, `YTDLP_SERVICE_URL`, `YTDLP_API_KEY`, `YTDLP_USERNAME`, `YTDLP_PASSWORD`, `LOG_LEVEL`.
+- **Docker**: Two images built from repo — `yt-dlp-service` (python:3.12-slim based) and `yt-media-info-mcp` (node:20-alpine based). No host Docker socket mount required (HTTP between containers, not Docker-socket subprocess).
+- **Configuration**: `env.example` with `ENABLE_SSE`, `YT_MEDIA_INFO_PORT`, `YT_MEDIA_INFO_HOST`, `YT_MEDIA_INFO_SERVICE_URL`, `YT_MEDIA_INFO_API_KEY`, `YT_MEDIA_INFO_USERNAME`, `YT_MEDIA_INFO_PASSWORD`, `LOG_LEVEL`.
 - **No breaking changes** — greenfield repository (`openspec/specs/` is empty, no existing code).

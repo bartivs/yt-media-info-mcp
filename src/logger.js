@@ -25,7 +25,7 @@ const logger = winston.createLogger({
     winston.format.splat(),
     winston.format.json()
   ),
-  defaultMeta: { service: 'yt-dlp-mcp-server' },
+  defaultMeta: { service: 'yt-media-info-mcp' },
   transports: [
     new winston.transports.Console({
       stderrLevels: ['error', 'warn', 'info', 'debug'],

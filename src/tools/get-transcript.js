@@ -1,7 +1,7 @@
 import logger from '../logger.js';
 import { transcriptParams } from '../schemas/transcriptSchema.js';
 
-const SERVICE_URL = process.env.YTDLP_SERVICE_URL || 'http://yt-dlp-service:8000';
+const SERVICE_URL = process.env.YT_MEDIA_INFO_SERVICE_URL || 'http://yt-media-info-service:8000';
 
 /**
  * get_transcript MCP tool
@@ -38,8 +38,8 @@ export const getTranscriptTool = (server, sseManager) =>
           url: params.url,
           language: params.language,
           timestamps: params.timestamps,
-          username: params.username || process.env.YTDLP_USERNAME || null,
-          password: params.password || process.env.YTDLP_PASSWORD || null,
+          username: params.username || process.env.YT_MEDIA_INFO_USERNAME || null,
+          password: params.password || process.env.YT_MEDIA_INFO_PASSWORD || null,
         };
 
         const response = await fetch(`${SERVICE_URL}/transcript`, {

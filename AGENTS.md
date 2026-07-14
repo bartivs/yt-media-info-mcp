@@ -1,4 +1,4 @@
-# yt-dlp MCP Server — Agent Guide
+# yt-media-info MCP — Agent Guide
 
 ## Quick start
 
@@ -16,12 +16,12 @@ npm run lint            # ESLint flat config
 - Wraps the **Python yt-dlp library** via a **persistent FastAPI HTTP service** (`yt-dlp-service`), not via `docker run --rm`. The service imports yt-dlp once at startup and caches extractors.
 - **Two transport modes** controlled by `ENABLE_SSE` env var:
   - **stdio** (`ENABLE_SSE=0`, default): connect via `StdioServerTransport` — used by Claude Desktop.
-  - **SSE** (`ENABLE_SSE=1`): Express on `YTDLP_HOST:YTDLP_PORT` (default `0.0.0.0:9423`). Endpoints: `GET /sse`, `POST /messages`, `POST /api`, `GET /health`.
+  - **SSE** (`ENABLE_SSE=1`): Express on `YT_MEDIA_INFO_HOST:YT_MEDIA_INFO_PORT` (default `0.0.0.0:9423`). Endpoints: `GET /sse`, `POST /messages`, `POST /api`, `GET /health`.
 - `POST /api` is a shortcut that calls the Python service directly for a specific tool (bypasses MCP protocol). Usage: `{ "tool": "extract_info", "args": { "url": "..." } }`.
 - **Three MCP tools**: `extract_info`, `get_transcript`, `search_media`.
 - **Two MCP prompts**: `analyze_video`, `summarize_transcript`.
-- Optional bearer API key auth (via `YTDLP_API_KEY` env var) protects HTTP endpoints in SSE mode. stdio mode is unaffected.
-- **Docker Compose** deployment: two containers (`yt-dlp-service` + `yt-dlp-mcp-server`) on a bridge network with healthcheck + `depends_on`. No host Docker socket mount required.
+- Optional bearer API key auth (via `YT_MEDIA_INFO_API_KEY` env var) protects HTTP endpoints in SSE mode. stdio mode is unaffected.
+- **Docker Compose** deployment: two containers (`yt-dlp-service` + `yt-media-info-mcp`) on a bridge network with healthcheck + `depends_on`. No host Docker socket mount required.
 
 ## Key files
 
@@ -52,8 +52,8 @@ npm run lint            # ESLint flat config
 
 - **No ffmpeg**: This server does NOT download media. It is an info-extraction and transcript tool. ffmpeg is not required and not included in the Python image.
 - **Python service cold start**: The first request after `docker compose up` will wait for the health check. Subsequent calls are warm.
-- **API key**: Set `YTDLP_API_KEY` in `.env` (copy from `env.example` first). Default is empty (no auth). stdio mode is never affected.
-- **Username/password**: Per-call `username`/`password` params override `env.example` defaults (`YTDLP_USERNAME`/`YTDLP_PASSWORD`). Passed through to yt-dlp's `YoutubeDL` opts for site authentication.
+- **API key**: Set `YT_MEDIA_INFO_API_KEY` in `.env` (copy from `env.example` first). Default is empty (no auth). stdio mode is never affected.
+- **Username/password**: Per-call `username`/`password` params override `env.example` defaults (`YT_MEDIA_INFO_USERNAME`/`YT_MEDIA_INFO_PASSWORD`). Passed through to yt-dlp's `YoutubeDL` opts for site authentication.
 - **`env.example` is committed** with safe defaults. Copy to `.env` and customize. Use `.env.local` for secrets that should not be tracked.
 - **Search platform mapping**: `youtube` → `ytsearch:`, `google_videos` → `gvsearch:`.
 - **Transcript language fallback**: If the requested language is unavailable, the first available language is returned. The response includes the actual language used.

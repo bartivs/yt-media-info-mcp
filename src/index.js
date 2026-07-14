@@ -16,14 +16,14 @@ import {
 } from './tools/index.js';
 
 // Environment
-const PORT = process.env.YTDLP_PORT || 9423;
-const HOST = process.env.YTDLP_HOST || '0.0.0.0';
+const PORT = process.env.YT_MEDIA_INFO_PORT || 9423;
+const HOST = process.env.YT_MEDIA_INFO_HOST || '0.0.0.0';
 const ENABLE_SSE = !!(process.env.ENABLE_SSE | 0);
-const API_KEY = process.env.YTDLP_API_KEY || '';
+const API_KEY = process.env.YT_MEDIA_INFO_API_KEY || '';
 
 // Create the MCP server
 const server = new McpServer({
-  name: 'yt-dlp MCP Server',
+  name: 'yt-media-info MCP',
   version: '1.0.0',
   description:
     'A Model Context Protocol server that extracts rich metadata from media URLs using yt-dlp',
@@ -91,7 +91,7 @@ function setupSSETransport() {
 
   // Health check endpoint
   app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok', service: 'yt-dlp-mcp-server' });
+    res.status(200).json({ status: 'ok', service: 'yt-media-info-mcp' });
   });
 
   // SSE connection endpoint
@@ -135,7 +135,7 @@ function setupSSETransport() {
       switch (tool) {
         case 'extract_info': {
           const serviceUrl =
-            process.env.YTDLP_SERVICE_URL || 'http://yt-dlp-service:8000';
+            process.env.YT_MEDIA_INFO_SERVICE_URL || 'http://yt-media-info-service:8000';
           const response = await fetch(`${serviceUrl}/info`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -143,9 +143,9 @@ function setupSSETransport() {
               url: args?.url,
               include_raw: args?.include_raw ?? true,
               username:
-                args?.username || process.env.YTDLP_USERNAME || null,
+                args?.username || process.env.YT_MEDIA_INFO_USERNAME || null,
               password:
-                args?.password || process.env.YTDLP_PASSWORD || null,
+                args?.password || process.env.YT_MEDIA_INFO_PASSWORD || null,
             }),
           });
           if (!response.ok) {
@@ -157,7 +157,7 @@ function setupSSETransport() {
         }
         case 'get_transcript': {
           const serviceUrl =
-            process.env.YTDLP_SERVICE_URL || 'http://yt-dlp-service:8000';
+            process.env.YT_MEDIA_INFO_SERVICE_URL || 'http://yt-media-info-service:8000';
           const response = await fetch(`${serviceUrl}/transcript`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -166,9 +166,9 @@ function setupSSETransport() {
               language: args?.language || 'en',
               timestamps: args?.timestamps ?? true,
               username:
-                args?.username || process.env.YTDLP_USERNAME || null,
+                args?.username || process.env.YT_MEDIA_INFO_USERNAME || null,
               password:
-                args?.password || process.env.YTDLP_PASSWORD || null,
+                args?.password || process.env.YT_MEDIA_INFO_PASSWORD || null,
             }),
           });
           if (!response.ok) {
@@ -180,7 +180,7 @@ function setupSSETransport() {
         }
         case 'search_media': {
           const serviceUrl =
-            process.env.YTDLP_SERVICE_URL || 'http://yt-dlp-service:8000';
+            process.env.YT_MEDIA_INFO_SERVICE_URL || 'http://yt-media-info-service:8000';
           const response = await fetch(`${serviceUrl}/search`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -233,7 +233,7 @@ function setupSSETransport() {
 // Main
 // ---------------------------------------------------------------------------
 async function runServer() {
-  logger.info('Starting yt-dlp MCP server...');
+  logger.info('Starting yt-media-info MCP...');
 
   try {
     const connectedTransports = [];
@@ -269,7 +269,7 @@ async function runServer() {
 // Graceful shutdown
 // ---------------------------------------------------------------------------
 async function shutdown() {
-  logger.info('Shutting down yt-dlp MCP server...');
+  logger.info('Shutting down yt-media-info MCP...');
 
   try {
     await server.disconnect();
