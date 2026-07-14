@@ -1,0 +1,52 @@
+version: '3'
+dotenv: ['.env', '.env.local']
+tasks:
+  default:
+    desc: This help
+    cmds:
+      - task -a --sort none
+    silent: true
+
+  start:
+    aliases: [s]
+    cmds:
+      - node src/index.js
+
+  dev:
+    cmds:
+      - nodemon src/index.js
+
+  install:
+    aliases: [i]
+    cmds:
+      - npm install
+
+  lint:
+    cmds:
+      - eslint src/
+
+  lint:fix:
+    cmds:
+      - eslint src/ --fix
+
+  build:service:
+    desc: Build the yt-dlp Python service Docker image
+    dir: service
+    cmds:
+      - >
+        docker build
+        --build-arg https_proxy=$https_proxy
+        --build-arg NODE_TLS_REJECT_UNAUTHORIZED=0
+        -t yt-dlp-service .
+
+  compose:up:
+    cmds:
+      - docker compose up -d
+
+  compose:down:
+    cmds:
+      - docker compose down
+
+  compose:logs:
+    cmds:
+      - docker compose logs -f

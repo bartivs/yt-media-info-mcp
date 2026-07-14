@@ -1,0 +1,43 @@
+services:
+  # Persistent Python service wrapping yt-dlp for metadata extraction
+  yt-dlp-service:
+    build:
+      context: ./service
+      dockerfile: Dockerfile
+    image: yt-dlp-service
+    container_name: yt-dlp-service
+    expose:
+      - "8000" # internal only, not published to host
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    env_file: .env
+    networks:
+      - yt-dlp-network
+
+  # Node MCP server exposing yt-dlp capabilities via MCP stdio/SSE
+  yt-dlp-mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: yt-dlp-mcp
+    container_name: yt-dlp-mcp
+    restart: unless-stopped
+    ports:
+      - "${YTDLP_PORT:-9423}:9423"
+    env_file: .env
+    environment:
+      # Override for Docker networking: Python service is reachable by service name
+      YTDLP_SERVICE_URL: http://yt-dlp-service:8000
+    depends_on:
+      yt-dlp-service:
+        condition: service_healthy
+    networks:
+      - yt-dlp-network
+
+networks:
+  yt-dlp-network:
+    driver: bridge
