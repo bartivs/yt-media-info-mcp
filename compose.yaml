@@ -49,6 +49,8 @@ services:
     container_name: cookie-bot
     profiles:
       - cookies
+    ports:
+      - "9222:9222"   # CDP remote debugging port for --setup mode (connect via chrome://inspect)
     env_file: .env
     environment:
       COOKIE_BOT_DATA_DIR: /data
