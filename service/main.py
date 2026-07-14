@@ -551,6 +551,12 @@ async def info(req: InfoRequest):
             "code": "EXTRACTION_ERROR",
         })
 
+    if raw is None:
+        raise HTTPException(status_code=422, detail={
+            "message": "yt-dlp extraction returned no data. The video may be unavailable, private, or require authentication.",
+            "code": "EXTRACTION_FAILED",
+        })
+
     curated = _curate_info(raw)
     if req.include_raw:
         curated["raw"] = raw
@@ -575,6 +581,12 @@ async def transcript(req: TranscriptRequest):
         raise HTTPException(status_code=500, detail={
             "message": f"Unexpected extraction error: {exc}",
             "code": "EXTRACTION_ERROR",
+        })
+
+    if raw is None:
+        raise HTTPException(status_code=422, detail={
+            "message": "yt-dlp extraction returned no data. The video may be unavailable, private, or require authentication.",
+            "code": "EXTRACTION_FAILED",
         })
 
     subtitles = raw.get("subtitles") or {}
