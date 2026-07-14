@@ -190,7 +190,6 @@ async def run_setup():
     proc = await asyncio.create_subprocess_exec(
         chromium_path,
         "--remote-debugging-port=9222",
-        "--remote-debugging-address=0.0.0.0",
         "--no-first-run",
         "--no-default-browser-check",
         "--no-sandbox",
@@ -211,6 +210,48 @@ async def run_setup():
         return
 
     logger.info("Chromium debug server is ready on port 9222")
+
+    # ── TCP proxy: Chromium only binds to 127.0.0.1, so we proxy
+    #    0.0.0.0:9422 → 127.0.0.1:9222 to allow external connections.
+    #    Docker maps host:9222 → container:9422.
+
+    async def _proxy_worker(
+        reader: asyncio.StreamReader,
+        writer: asyncio.StreamWriter,
+    ) -> None:
+        try:
+            remote_r, remote_w = await asyncio.wait_for(
+                asyncio.open_connection("127.0.0.1", 9222), timeout=5
+            )
+        except (OSError, asyncio.TimeoutError):
+            writer.close()
+            return
+
+        async def _pipe(a: asyncio.StreamReader, b: asyncio.StreamWriter) -> None:
+            try:
+                while True:
+                    data = await a.read(65536)
+                    if not data:
+                        break
+                    b.write(data)
+                    await b.drain()
+            except Exception:
+                pass
+            finally:
+                try:
+                    b.close()
+                except Exception:
+                    pass
+
+        await asyncio.gather(
+            _pipe(reader, remote_w),
+            _pipe(remote_r, writer),
+        )
+
+    proxy_server = await asyncio.start_server(
+        _proxy_worker, "0.0.0.0", 9422
+    )
+    logger.info("TCP proxy listening on 0.0.0.0:9422 → 127.0.0.1:9222")
 
     async with async_playwright() as pw:
         browser = await pw.chromium.connect_over_cdp(
@@ -254,7 +295,9 @@ async def run_setup():
 
         await context.close()
 
-    # Shut down Chromium
+    # Shut down proxy and Chromium
+    proxy_server.close()
+    await proxy_server.wait_closed()
     proc.terminate()
     try:
         await asyncio.wait_for(proc.wait(), timeout=5)

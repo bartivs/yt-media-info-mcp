@@ -50,7 +50,7 @@ services:
     profiles:
       - cookies
     ports:
-      - "9222:9222"   # CDP remote debugging port for --setup mode (connect via chrome://inspect)
+      - "9222:9422"   # CDP remote debugging: host:9222 → proxy:9422 → chromium:127.0.0.1:9222
     env_file: .env
     environment:
       COOKIE_BOT_DATA_DIR: /data
