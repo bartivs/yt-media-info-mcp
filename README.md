@@ -12,6 +12,33 @@
 
 Built to sit alongside web-search tools as a **media-enrichment step** in an information-gathering pipeline. Works with Claude Desktop, Claude Code, LiteLLM, and any MCP client over stdio or SSE.
 
+## Works with
+
+Compatible with any client that speaks the Model Context Protocol:
+
+- **[Claude Desktop](https://claude.ai/download)** — via stdio transport
+- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — via SSE transport
+- **[LiteLLM](https://github.com/BerriAI/litellm)** — as an `mcp` model in the gateway config
+- **Open WebUI** and any MCP-aware agent framework
+- **Custom apps** — via the MCP SDK (SSE) or the plain JSON `POST /api` shortcut
+
+## Table of Contents
+
+- [Features](#features)
+- [Use Cases](#use-cases)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage with Claude Desktop, Claude Code, LiteLLM, and the Direct API](#usage-with-claude-desktop-claude-code-litellm-and-the-direct-api)
+- [Docker Compose](#docker-compose)
+- [Available MCP Tools](#available-mcp-tools)
+- [Available Prompts](#available-prompts)
+- [Output Conventions: snake_case fields and ISO 8601 dates](#output-conventions-snake-case-fields-and-iso-8601-dates)
+- [Cookie Management and Authentication](#cookie-management-and-authentication)
+- [Scope: metadata and transcripts only, no downloads](#scope-metadata-and-transcripts-only-no-downloads)
+- [Development](#development)
+- [License: MIT](#license-mit)
+
 ## Features
 
 - **Extract rich metadata** from any yt-dlp-supported URL (YouTube, Vimeo, Twitch, and ~1800 more sites)
@@ -23,6 +50,16 @@ Built to sit alongside web-search tools as a **media-enrichment step** in an inf
 - **Multiple transport options**: stdio for Claude Desktop, SSE for web clients
 - **Direct API endpoint** (`POST /api`) for quick testing without MCP protocol
 - **Persistent Python backend**: no cold-start per call (imports yt-dlp once at startup)
+
+## Use Cases
+
+- **RAG over video** — pull a video's transcript and metadata into a retrieval pipeline so an LLM can answer questions about the content without watching it.
+- **Summarize lectures, talks, and podcasts** — feed the transcript to a model for key points, notable quotes, and takeaways (see the `summarize_transcript` prompt).
+- **Podcast & lecture indexing** — extract titles, descriptions, chapters, and durations to build searchable catalogs of audio/video content.
+- **Accessibility via captions** — retrieve subtitles (manual or auto-generated) in any available language for transcription and translation workflows.
+- **Channel & playlist research** — expand a playlist or channel into structured per-video metadata for analysis, deduplication, or ranking.
+- **Media enrichment in search pipelines** — pair with a web-search tool: discover candidate URLs, then enrich each one with full metadata and transcripts before summarization.
+- **Content discovery** — use `search_media` to find videos on YouTube or Google Video by query, then drill into the ones that matter.
 
 ## Prerequisites
 
@@ -75,7 +112,7 @@ YT_MEDIA_INFO_SERVICE_URL=http://localhost:8000 npm start
 
 Copy `.env.example` to `.env` and customize. `.env` is gitignored — use `.env.local` for per-machine secrets not tracked by git.
 
-## Usage
+## Usage with Claude Desktop, Claude Code, LiteLLM, and the Direct API
 
 ### Claude Desktop (stdio)
 
@@ -195,7 +232,7 @@ docker compose build           # rebuild after changes
 
 The `yt-dlp-service` container is persistent and stays warm. The `yt-media-info-mcp` container waits for the health check on the Python service before accepting connections.
 
-## Available Tools
+## Available MCP Tools
 
 ### extract_info
 
@@ -247,13 +284,13 @@ Supplementary discovery tool. Searches for media using yt-dlp's search prefixes 
 - **analyze_video**: Analyze a video/media item from its available metadata (title, description, duration, uploader, categories, optional transcript summary).
 - **summarize_transcript**: Summarize a video transcript to extract key points, notable quotes, and practical takeaways.
 
-## Output Conventions
+## Output Conventions: snake_case fields and ISO 8601 dates
 
 - **snake_case** field names (matches yt-dlp's native format)
 - **ISO 8601** date strings (e.g. `"2024-01-15"` for upload_date, `"2024-01-15T14:30:00Z"` for timestamps)
 - **Best-effort error handling**: complete failures return an error response; missing fields are `null`; playlist entries that fail are collected in a `failures` array
 
-## Cookie Management
+## Cookie Management and Authentication
 
 When running in SSE mode, the server provides a web-based cookie upload form at `http://<host>:<port>/` (default `http://localhost:9423/`) for uploading Netscape-format cookie files.
 
@@ -294,7 +331,7 @@ If you have the [cookie-bot sidecar](AGENTS.md#cookie-bot-optional-sidecar) runn
 
 > **Note:** The cookie-bot's automated refresh will overwrite a manually uploaded file. Use the web form for initial seeding, then let the bot handle refreshes.
 
-## Scope
+## Scope: metadata and transcripts only, no downloads
 
 **This server does NOT download media files.** It is a metadata enrichment and transcript extraction tool designed to work alongside other search and retrieval tools. No ffmpeg is required.
 
@@ -306,6 +343,6 @@ npm run lint     # ESLint
 npm run lint:fix # ESLint auto-fix
 ```
 
-## License
+## License: MIT
 
-MIT
+This project is licensed under the [MIT License](LICENSE).
