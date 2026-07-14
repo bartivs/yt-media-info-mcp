@@ -15,6 +15,7 @@ import json
 import logging
 import os
 import re
+import time
 import urllib.request
 from datetime import datetime, timezone
 from typing import Optional
@@ -108,6 +109,10 @@ def _build_ydl_opts(username: Optional[str] = None, password: Optional[str] = No
 
     A new dict is returned for every call so that no state is shared across
     requests.  Only fields relevant to *extraction* (not downloading) are set.
+
+    Reads YT_MEDIA_INFO_COOKIES_FILE from the environment. If set and the file
+    exists, passes it as "cookiefile" to yt-dlp.  If set but missing, logs a
+    warning and proceeds without cookies.
     """
     opts = {
         "quiet": True,
@@ -120,6 +125,15 @@ def _build_ydl_opts(username: Optional[str] = None, password: Optional[str] = No
         opts["username"] = username
     if password:
         opts["password"] = password
+
+    # Optional cookie file for session-based auth
+    cookie_file = os.environ.get("YT_MEDIA_INFO_COOKIES_FILE")
+    if cookie_file:
+        if os.path.exists(cookie_file):
+            opts["cookiefile"] = cookie_file
+        else:
+            logger.warning("Cookie file %s not found — proceeding without cookies", cookie_file)
+
     return opts
 
 
@@ -530,8 +544,30 @@ def _extract_info(url: str, username: str = None, password: str = None) -> dict:
 
 @app.get("/health")
 async def health():
-    """Health check for Docker compose."""
-    return {"status": "ok", "service": "yt-media-info-service"}
+    """Health check for Docker compose.
+
+    Reports:
+      - Service status
+      - Cookie file path, age in seconds, and whether it exists
+        (only if YT_MEDIA_INFO_COOKIES_FILE is set)
+    """
+    result = {"status": "ok", "service": "yt-media-info-service"}
+
+    cookie_file = os.environ.get("YT_MEDIA_INFO_COOKIES_FILE")
+    if cookie_file:
+        cookie_info = {
+            "path": cookie_file,
+            "exists": os.path.exists(cookie_file),
+        }
+        if cookie_info["exists"]:
+            try:
+                mtime = os.path.getmtime(cookie_file)
+                cookie_info["age_seconds"] = round(time.time() - mtime, 1)
+            except OSError:
+                cookie_info["age_seconds"] = None
+        result["cookies"] = cookie_info
+
+    return result
 
 
 @app.post("/info")

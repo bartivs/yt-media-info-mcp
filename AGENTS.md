@@ -59,3 +59,49 @@ npm run lint            # ESLint flat config
 - **Transcript language fallback**: If the requested language is unavailable, the first available language is returned. The response includes the actual language used.
 - **No caching**: Each `extract_info` call re-extracts metadata from the URL. No in-memory caching in v1.
 - **Supported sites**: All ~1800 yt-dlp extractors work out of the box. No cookie/JWT authentication for private videos in v1.
+
+## cookie-bot (optional sidecar)
+
+A headless Playwright+Chromium sidecar that maintains fresh session cookies for
+YouTube, Vimeo, and Twitch. Cookies are written atomically to a shared Docker
+volume and consumed by the Python service on every yt-dlp call.
+
+### Architecture
+
+- **Directory**: `cookie-bot/cookie_bot/` — Python package
+- **Dockerfile**: `cookie-bot/Dockerfile` — base `mcr.microsoft.com/playwright/python:v1.53.0`
+- **Service name**: `cookie-bot` (Compose profile `--profile cookies`)
+- **Shared volume**: `cookies-data` named volume (ro mount on yt-media-info-service, rw on cookie-bot)
+- **Cookie file**: `/data/cookies.txt` (Netscape format, read by yt-dlp as `cookiefile`)
+- **Session persistence**: Playwright `storage_state()` saved to `/data/browser-state.json`
+
+### Environment variables
+
+All cookie-related vars are **optional**. The system works without cookies.
+
+| Variable | Used by | Description |
+|----------|---------|-------------|
+| `YT_MEDIA_INFO_COOKIES_FILE` | Python service | Path to Netscape cookie file on shared volume |
+| `BOT_REFRESH_INTERVAL` | cookie-bot | Seconds between refresh cycles (default 14400) |
+| `GOOGLE_EMAIL` / `PASSWORD` | cookie-bot | Google account credentials |
+| `GOOGLE_TOTP_SECRET` | cookie-bot | TOTP seed for 2FA (optional) |
+| `VIMEO_EMAIL` / `PASSWORD` | cookie-bot | Vimeo account credentials |
+| `TWITCH_EMAIL` / `PASSWORD` | cookie-bot | Twitch account credentials |
+| `TWITCH_TOTP_SECRET` | cookie-bot | TOTP seed for 2FA (optional) |
+
+### Setup steps
+
+1. Configure provider credentials in `.env`
+2. Start with profile: `docker compose --profile cookies up -d`
+3. Run interactive setup: `docker compose --profile cookies run --service-ports cookie-bot --setup`
+4. Connect via `chrome://inspect`, log in, press Enter in terminal
+5. Bot runs automatically, refreshing cookies every 4 hours
+
+### Gotchas
+
+- **CAPTCHA limitation**: Automated login cannot solve CAPTCHAs. Run `--setup` for interactive login.
+- **Playwright image size**: ~1.2 GB. Gated behind `--profile cookies` to avoid pulling by default.
+- **CDP setup requirement**: First deployment requires a `--setup` run. The bot can't bootstrap itself without help.
+- **Vimeo no 2FA**: Vimeo provider does not include 2FA support (Vimeo rarely uses it).
+- **Session expiry**: If automated re-login fails, re-run `--setup` to establish a fresh session.
+- **Cookie file staleness**: If cookies expire and the bot can't refresh, yt-dlp falls back to cookieless behaviour (same as current).

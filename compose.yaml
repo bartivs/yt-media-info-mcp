@@ -17,6 +17,8 @@ services:
     env_file: .env
     networks:
       - yt-media-info-network
+    volumes:
+      - cookies-data:/data:ro
 
   # Node MCP server exposing yt-dlp capabilities via MCP stdio/SSE
   yt-media-info-mcp:
@@ -38,6 +40,28 @@ services:
     networks:
       - yt-media-info-network
 
+  # Playwright+Chromium sidecar for automated cookie refresh (opt-in via --profile cookies)
+  cookie-bot:
+    build:
+      context: ./cookie-bot
+      dockerfile: Dockerfile
+    image: cookie-bot
+    container_name: cookie-bot
+    profiles:
+      - cookies
+    env_file: .env
+    environment:
+      COOKIE_BOT_DATA_DIR: /data
+      COOKIE_BOT_COOKIE_FILE: /data/cookies.txt
+    volumes:
+      - cookies-data:/data
+    networks:
+      - yt-media-info-network
+    restart: unless-stopped
+
 networks:
   yt-media-info-network:
     driver: bridge
+
+volumes:
+  cookies-data:
